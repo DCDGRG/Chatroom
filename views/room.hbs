@@ -1,0 +1,23 @@
+<h1> Room  {{roomName}}</h1>
+
+<p>
+    The room you are visiting is {{ roomName }}, welcome!
+</p>
+
+<p>To generate a new room, here is the room id: {{ newRoomId }}</p>
+
+ <form action="/{{roomName}}/messages" method="POST">
+    <input type="text" name="nickName" placeholder="Enter your nickname">
+    <textarea name="text" placeholder="Type your message" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+
+<h2>Messages Display</h2>
+
+<ul id="messages">
+    {{#each messages}}
+        <li>{{timestamp}}---{{nickName}}:   {{text}}</li>
+    {{/each}}
+</ul>
+
+

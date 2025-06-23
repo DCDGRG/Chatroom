@@ -1,0 +1,19 @@
+<h1> Home </h1>
+<p>This is the {{ title }} page</p>
+
+<form action="/createRoom" method="POST">
+  <input type="text" name="roomName" placeholder="Chat room name">
+  <button type="submit">Create Chat Room</button>
+</form>
+
+
+<h2>Chat Rooms List</h2>
+<ul id = "chatroom-list">
+  {{#each chatRooms}}
+    <li>
+        <a href="/{{this}}">{{this}}</a>
+        </li>
+  {{/each}}
+</ul>
+
+
