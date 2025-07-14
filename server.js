@@ -3,6 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const hbs = require('express-handlebars');
 const path = require('path');
+const mongoose = require('mongoose');
 
 // import handlers
 const homeHandler = require('./controllers/home.js');
@@ -15,6 +16,15 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/chatapp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
 
 // If you choose not to use handlebars as template engine, you can safely delete the following part and use your own way to render content
 // view engine setup

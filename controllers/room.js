@@ -1,40 +1,71 @@
-
-
-const roomGenerator = require('../util/roomIdGenerator.js');
 const moment = require('moment');
-const chatRooms = require('./home').chatRooms; // 引入共享的 chatRooms 对象
+const Room = require('../models/Room');
+const Message = require('../models/Message');
 
-function getRoom(request, response) {
-  const roomName = request.params.roomName;
-  if (chatRooms[roomName]) {
-    response.render('room', {
+async function getRoom(req, res) {
+  try {
+    const roomName = req.params.roomName;
+    let room = await Room.findOne({ name: roomName });
+    if (!room) {
+      room = await Room.create({ name: roomName });
+    }
+    // Fetch messages for this room, sorted by timestamp
+    const messages = await Message.find({ room: room._id }).sort('timestamp');
+    // Format timestamps for display
+    const formattedMessages = messages.map(msg => ({
+      nickName: msg.nickName,
+      text: msg.text,
+      timestamp: moment(msg.timestamp).format('h:mm a')
+    }));
+    res.render('room', {
       title: 'chatroom',
       roomName: roomName,
-      newRoomId: roomGenerator.roomIdGenerator(),
-      messages: chatRooms[roomName],    //传递当前房间的所有消息
+      messages: formattedMessages
     });
-  } else {
-    response.status(404).send('Room not found');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
   }
 }
 
-function getMessages(req, res) {
-  const roomName = req.params.roomName;
-  res.json(chatRooms[roomName] || []);
+async function getMessages(req, res) {
+  try {
+    const roomName = req.params.roomName;
+    const room = await Room.findOne({ name: roomName });
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+    const messages = await Message.find({ room: room._id }).sort('timestamp');
+    const formatted = messages.map(msg => ({
+      nickName: msg.nickName,
+      text: msg.text,
+      timestamp: moment(msg.timestamp).format('h:mm a')
+    }));
+    res.json(formatted);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
 }
 
-function sendMessages(req, res) {
-  const roomName = req.params.roomName;
-  const message = {
-    nickName: req.body.nickName,
-    text: req.body.text,
-    timestamp: moment().format('h:mm a')
-  };
-  if (chatRooms[roomName]) {
-    chatRooms[roomName].push(message);
-    res.status(200).send();
-  } else {
-    res.status(404).send('Room not found');
+async function sendMessages(req, res) {
+  try {
+    const roomName = req.params.roomName;
+    const room = await Room.findOne({ name: roomName });
+    if (!room) {
+      return res.status(404).send('Room not found');
+    }
+    const { nickName, text } = req.body;
+    await Message.create({
+      room: room._id,
+      nickName,
+      text,
+      timestamp: moment().toDate()
+    });
+    res.redirect(`/${roomName}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
   }
 }
 

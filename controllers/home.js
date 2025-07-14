@@ -1,16 +1,31 @@
+const Room = require('../models/Room');
 
-const chatRooms = {}; // 定义共享的 chatRooms 对象
-
-function getHome(request, response) {
-  response.render('home', { title: 'home', chatRooms: Object.keys(chatRooms) });
+async function getHome(req, res) {
+  try {
+    const rooms = await Room.find({});
+    res.render('home', { title: 'home', chatRooms: rooms.map(r => r.name) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
 }
 
-function createRoom(req, res) {
-  const roomName = req.body.roomName || generateRandomID();
-  if (!chatRooms[roomName]) {
-    chatRooms[roomName] = []; // 初始化房间的消息数组
+async function createRoom(req, res) {
+  try {
+    let roomName = req.body.roomName || generateRandomID();
+    roomName = roomName.trim();
+    if (!roomName) {
+      return res.redirect('/');
+    }
+    let room = await Room.findOne({ name: roomName });
+    if (!room) {
+      await Room.create({ name: roomName });
+    }
+    res.redirect(`/${roomName}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
   }
-  res.redirect(`/${roomName}`);
 }
 
 function generateRandomID() {
@@ -19,6 +34,5 @@ function generateRandomID() {
 
 module.exports = {
   getHome,
-  createRoom,
-  chatRooms, // 导出 chatRooms 对象
+  createRoom
 };
