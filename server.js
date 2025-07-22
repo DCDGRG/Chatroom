@@ -10,18 +10,17 @@ const homeHandler = require('./controllers/home.js');
 const roomHandler = require('./controllers/room.js');
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to MongoDB using environment variable
-const mongoUri = process.env.MONGO_URI;
-if (!mongoUri) {
-  console.error('❌ MONGO_URI not defined');
-  process.exit(1);
+// Connect to MongoDB (Atlas via MONGO_URI, or local fallback)
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/chatapp';
+if (!process.env.MONGO_URI) {
+  console.warn('⚠️ MONGO_URI not defined. Falling back to local MongoDB.');
 }
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
@@ -32,7 +31,6 @@ mongoose.connect(mongoUri, {
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
-
 
 // If you choose not to use handlebars as template engine, you can safely delete the following part and use your own way to render content
 // view engine setup

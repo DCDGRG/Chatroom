@@ -2,9 +2,15 @@ const moment = require('moment');
 const Room = require('../models/Room');
 const Message = require('../models/Message');
 
+const VALID_ROOM_NAME = /^[a-zA-Z0-9_-]{2,32}$/;
+
 async function getRoom(req, res) {
   try {
     const roomName = req.params.roomName;
+    // Only allow valid room names
+    if (!VALID_ROOM_NAME.test(roomName)) {
+      return res.status(404).send('Invalid room name');
+    }
     let room = await Room.findOne({ name: roomName });
     if (!room) {
       room = await Room.create({ name: roomName });

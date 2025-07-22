@@ -1,6 +1,6 @@
 <div class="row justify-content-center mb-4">
   <div class="col-md-8 text-center">
-    <h1 class="display-4 mb-3">🏠 Welcome to the Chat Room</h1>
+    <h1 class="display-4 mb-3 lead">🏠 Welcome to the Chat Room</h1>
     <p class="lead">Here you can create or join a room and chat with friends!</p>
   </div>
 </div>
@@ -9,10 +9,10 @@
   <div class="col-md-6">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h5 class="card-title mb-3">Create a New Chat Room</h5>
+        <h5 class="card-title mb-3 text-theme-green">Create a New Chat Room</h5>
         <form action="/createRoom" method="POST" class="row g-2 align-items-center">
           <div class="col-8">
-            <input type="text" name="roomName" class="form-control" placeholder="Chat room name" required>
+            <input type="text" name="roomName" class="form-control input-theme-placeholder" placeholder="Chat room name" required>
           </div>
           <div class="col-4">
             <button type="submit" class="btn btn-primary w-100">Create Room</button>
@@ -27,13 +27,13 @@
   <div class="col-md-6">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h5 class="card-title">Available Chat Rooms</h5>
+        <h5 class="card-title text-theme-green">Available Chat Rooms</h5>
         {{#if chatRooms.length}}
         <ul class="list-group">
           {{#each chatRooms}}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{this}}</span>
-              <a href="/{{this}}" class="btn btn-outline-success btn-sm">Join</a>
+              <a href="/{{this}}" class="btn btn-outline-success w-25">Join</a>
             </li>
           {{/each}}
         </ul>

@@ -7,14 +7,16 @@ async function getHome(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
-  }
 }
+}
+
+const VALID_ROOM_NAME = /^[a-zA-Z0-9_-]{2,32}$/;
 
 async function createRoom(req, res) {
   try {
     let roomName = req.body.roomName || generateRandomID();
     roomName = roomName.trim();
-    if (!roomName) {
+    if (!roomName || !VALID_ROOM_NAME.test(roomName)) {
       return res.redirect('/');
     }
     let room = await Room.findOne({ name: roomName });
